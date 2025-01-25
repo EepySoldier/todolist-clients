@@ -81,12 +81,17 @@
         color: #d3e4f1;
         transition: background 0.3s ease;
 
+        .todo-name:hover{
+            cursor: pointer;
+        }
+
         &:hover {
             background: #3a5f7d;
-            cursor: pointer;
         }
     }
 }
+
+
 
 #todo-add {
     width: 100%;
@@ -99,5 +104,30 @@
 
     &:hover {
         background: #3a89b5;
+    }
+}
+
+#editModal {
+    z-index: 1000;
+    border-radius: 8px;
+
+    button:hover {
+        cursor: pointer;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    #modalSave {
+        color:green;
+    }
+
+    #modalDelete {
+        color: red;
     }
 }

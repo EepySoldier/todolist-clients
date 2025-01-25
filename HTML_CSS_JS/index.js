@@ -15,10 +15,10 @@ const login = document.getElementById('login');
 document.getElementById('login-form').addEventListener('submit', (e) => {
     e.preventDefault();
 
-    let username = document.getElementById('username').value;
-    let password = document.getElementById('password').value;
+    let username = document.getElementById('username').value.trim().toLowerCase();
+    let password = document.getElementById('password').value.trim();
 
-    if(username === credentials.username && password === credentials.password){
+    if(username === credentials.username.toLowerCase() && password === credentials.password){
         login.style.display = 'none';
         app.style.display = 'block';
     }
@@ -34,6 +34,7 @@ function renderTodos(_todos) {
         todoDiv.classList.add('todo');
 
         const todoSpan = document.createElement('span');
+        todoSpan.classList.add('todo-name')
         todoSpan.textContent = todoName;
 
         const todoCheckbox = document.createElement('input');
@@ -48,6 +49,42 @@ function renderTodos(_todos) {
                 todoSpan.style.textDecoration = "line-through";
             }
         })
+
+        todoSpan.addEventListener('click', () => {
+            const modal = document.getElementById('editModal');
+            const modalInput = document.getElementById('modalInput');
+            const modalSave = document.getElementById('modalSave');
+            const modalDelete = document.getElementById('modalDelete');
+            const modalCancel = document.getElementById('modalCancel');
+
+            modalInput.value = todoName.trim();
+            modal.style.display = 'block';
+
+            modalSave.onclick = () => {
+                const updatedName = modalInput.value.trim();
+
+                if (updatedName) {
+                    todosList = todosList.map(todo => {
+                       if(todo === todoName) {
+                           return updatedName;
+                       }
+                       return todo;
+                   })
+
+                    renderTodos(todosList);
+                }
+                modal.style.display = 'none'; // Close modal
+            };
+            modalCancel.onclick = () => {
+                modal.style.display = 'none';
+            }
+            modalDelete.onclick = () => {
+                todosList = todosList.filter(todo => todo !== todoName);
+
+                renderTodos(todosList);
+                modal.style.display = 'none';
+            }
+        });
 
         todoDiv.appendChild(todoSpan);
         todoDiv.appendChild(todoCheckbox);
@@ -87,4 +124,6 @@ searchButton.addEventListener('click', () => {
     }
     searchbar.value = '';
 })
+
+
 

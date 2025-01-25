@@ -73,7 +73,7 @@ function renderTodos(_todos) {
 
                     renderTodos(todosList);
                 }
-                modal.style.display = 'none'; // Close modal
+                modal.style.display = 'none';
             };
             modalCancel.onclick = () => {
                 modal.style.display = 'none';

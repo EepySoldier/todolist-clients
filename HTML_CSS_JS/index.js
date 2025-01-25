@@ -25,12 +25,11 @@ document.getElementById('login-form').addEventListener('submit', (e) => {
 })
 
 
-const todos = document.getElementById('todos');
-
-function renderTodos() {
+function renderTodos(_todos) {
+    const todos = document.getElementById('todos');
     todos.innerHTML = '';
 
-    todosList.forEach((todoName) => {
+    _todos.forEach((todoName) => {
         const todoDiv = document.createElement('div');
         todoDiv.classList.add('todo');
 
@@ -57,7 +56,7 @@ function renderTodos() {
     });
 }
 
-renderTodos()
+renderTodos(todosList)
 
 const todoAdd = document.getElementById('todo-add');
 
@@ -70,7 +69,22 @@ todoAdd.addEventListener('click', () => {
     }
 
     todosList = [...todosList, title]
-    renderTodos()
+    renderTodos(todosList)
+    searchbar.value = '';
+})
+
+const searchButton = document.getElementById('search-button');
+
+searchButton.addEventListener('click', () => {
+    const value = searchbar.value.toString();
+    if(value === ''){
+        renderTodos(todosList)
+    } else {
+        const newTodos = todosList.filter(todo => {
+            return todo.includes(value)
+        })
+        renderTodos(newTodos)
+    }
     searchbar.value = '';
 })
 

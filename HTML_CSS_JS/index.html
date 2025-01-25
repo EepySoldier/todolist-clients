@@ -8,12 +8,24 @@
     <meta name="author" content="Szymon">
     <title>TODO App</title>
     <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./app.css">
+    <link rel="stylesheet" href="./login.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app">
+    <div id="login">
+        <h1>Login</h1>
+        <form id="login-form">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="Enter Username">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Enter Password">
+            <input type="submit" value="Login">
+        </form>
+    </div>
+    <div id="app" class="app">
         <h1>TODO App with HTML, CSS & JS</h1>
 
         <div class="todo-list">

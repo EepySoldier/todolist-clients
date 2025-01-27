@@ -1,46 +1,69 @@
-//TODO: Redo the login logic when a proper backend is made
-
-const credentials = {
-    username: "Jan",
-    password: "123"
-}
-
-let todosList = ['Default Todo']
+let todosList = [["Default todo", false]];
+let id = null;
 
 const searchbar = document.getElementById('searchbar');
 
 const app = document.getElementById('app');
 const login = document.getElementById('login');
 
-document.getElementById('login-form').addEventListener('submit', (e) => {
+document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     let username = document.getElementById('username').value.trim().toLowerCase();
     let password = document.getElementById('password').value.trim();
 
-    if(username === credentials.username.toLowerCase() && password === credentials.password){
-        login.style.display = 'none';
-        app.style.display = 'block';
-    }
-})
+    try {
+        const response = await fetch('http://localhost:3000/users/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
 
+        const result = await response.json();
+
+        if (result.success) {
+            todosList = result.todos.map(todo => [todo.name, todo.done]);
+            id = result.uid;
+            renderTodos(todosList)
+            login.style.display = 'none';
+            app.style.display = 'block';
+        } else {
+            alert("Invalid username or password!");
+        }
+    } catch (error) {
+        console.error("Error during login:", error);
+    }
+});
 
 function renderTodos(_todos) {
     const todos = document.getElementById('todos');
     todos.innerHTML = '';
 
-    _todos.forEach((todoName) => {
+    //Todo[0] - name, Todo[1] - done
+    _todos.forEach((todo) => {
         const todoDiv = document.createElement('div');
         todoDiv.classList.add('todo');
 
         const todoSpan = document.createElement('span');
         todoSpan.classList.add('todo-name')
-        todoSpan.textContent = todoName;
+        todoSpan.textContent = todo[0];
 
         const todoCheckbox = document.createElement('input');
         todoCheckbox.type = 'checkbox';
+        todoCheckbox.checked = todo[1]
+
+        if (todoCheckbox.checked) {
+            todoSpan.style.color = 'gray';
+            todoSpan.style.textDecoration = 'line-through';
+        }
 
         todoCheckbox.addEventListener("click", () => {
+            todo[1] = !todo[1]
             if(todoSpan.style.textDecoration === "line-through") {
                 todoSpan.style.color = "white";
                 todoSpan.style.textDecoration = "none";
@@ -51,24 +74,24 @@ function renderTodos(_todos) {
         })
 
         todoSpan.addEventListener('click', () => {
-            const modal = document.getElementById('editModal');
-            const modalInput = document.getElementById('modalInput');
-            const modalSave = document.getElementById('modalSave');
-            const modalDelete = document.getElementById('modalDelete');
-            const modalCancel = document.getElementById('modalCancel');
+            const modal = document.getElementById('edit-modal');
+            const modalInput = document.getElementById('modal-input');
+            const modalSave = document.getElementById('modal-save');
+            const modalDelete = document.getElementById('modal-delete');
+            const modalCancel = document.getElementById('modal-cancel');
 
-            modalInput.value = todoName.trim();
+            modalInput.value = todo[0].trim();
             modal.style.display = 'block';
 
             modalSave.onclick = () => {
                 const updatedName = modalInput.value.trim();
 
                 if (updatedName) {
-                    todosList = todosList.map(todo => {
-                       if(todo === todoName) {
-                           return updatedName;
+                    todosList = todosList.map(Todo => {
+                       if(Todo[0] === todo[0]) {
+                           return [updatedName, Todo[1]];
                        }
-                       return todo;
+                       return Todo;
                    })
 
                     renderTodos(todosList);
@@ -79,7 +102,7 @@ function renderTodos(_todos) {
                 modal.style.display = 'none';
             }
             modalDelete.onclick = () => {
-                todosList = todosList.filter(todo => todo !== todoName);
+                todosList = todosList.filter(Todo => Todo[0] !== todo[0]);
 
                 renderTodos(todosList);
                 modal.style.display = 'none';
@@ -93,8 +116,6 @@ function renderTodos(_todos) {
     });
 }
 
-renderTodos(todosList)
-
 const todoAdd = document.getElementById('todo-add');
 
 todoAdd.addEventListener('click', () => {
@@ -105,7 +126,7 @@ todoAdd.addEventListener('click', () => {
         return;
     }
 
-    todosList = [...todosList, title]
+    todosList = [...todosList, [title, false]]
     renderTodos(todosList)
     searchbar.value = '';
 })
@@ -125,5 +146,24 @@ searchButton.addEventListener('click', () => {
     searchbar.value = '';
 })
 
+const saveButton = document.getElementById('save-button');
 
+saveButton.addEventListener('click', async () => {
+    try {
+        const response = await fetch('http://localhost:3000/todos/save', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({todos: todosList, UID: id})
+        });
 
+        if (response.ok) {
+            alert("Todos saved successfully");
+        } else {
+            alert("Something went wrong");
+        }
+    } catch (error) {
+        console.error("Error saving todos: ", error);
+    }
+})

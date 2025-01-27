@@ -5,11 +5,6 @@ const searchbar = document.getElementById('searchbar');
 const app = document.getElementById('app');
 const login = document.getElementById('login');
 
-if(localStorage.getItem('accessToken')) {
-    login.style.display = 'none';
-    app.style.display = 'block';
-}
-
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -209,6 +204,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const accessToken = localStorage.getItem('accessToken');
 
     if (accessToken) {
+        login.style.display = 'none';
+        app.style.display = 'block';
         try {
             const response = await fetch('http://localhost:3000/todos/fetch', {
                 method: "GET",

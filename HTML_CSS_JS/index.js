@@ -1,9 +1,14 @@
-let todosList = [["Default todo", false]];
+let todosList = [];
 
 const searchbar = document.getElementById('searchbar');
 
 const app = document.getElementById('app');
 const login = document.getElementById('login');
+
+if(localStorage.getItem('accessToken')) {
+    login.style.display = 'none';
+    app.style.display = 'block';
+}
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -88,16 +93,26 @@ function renderTodos(_todos) {
             modalSave.onclick = () => {
                 const updatedName = modalInput.value.trim();
 
-                if (updatedName) {
-                    todosList = todosList.map(Todo => {
-                       if(Todo[0] === todo[0]) {
-                           return [updatedName, Todo[1]];
-                       }
-                       return Todo;
-                   })
-
-                    renderTodos(todosList);
+                if (!updatedName) {
+                    alert("Todo name cannot be empty.");
+                    return;
                 }
+
+                const isDuplicate = todosList.some(Todo => Todo[0] === updatedName);
+
+                if (isDuplicate) {
+                    alert("A todo with this name already exists. Please use a different name.");
+                    return;
+                }
+
+                todosList = todosList.map(Todo => {
+                    if (Todo[0] === todo[0]) {
+                        return [updatedName, Todo[1]];
+                    }
+                    return Todo;
+                });
+
+                renderTodos(todosList);
                 modal.style.display = 'none';
             };
             modalCancel.onclick = () => {
@@ -120,14 +135,21 @@ function renderTodos(_todos) {
 
 const todoAdd = document.getElementById('todo-add');
 todoAdd.addEventListener('click', () => {
-    const title = searchbar.value.toString();
+    const todoName = searchbar.value.toString();
 
-    if(title === ''){
+    if(todoName === ''){
         alert("Todo name can't be empty");
         return;
     }
 
-    todosList = [...todosList, [title, false]]
+    const isDuplicate = todosList.some(Todo => Todo[0] === todoName);
+    if (isDuplicate) {
+        alert("A todo with this name already exists. Please use a different name.");
+        searchbar.value = '';
+        return;
+    }
+
+    todosList = [...todosList, [todoName, false]]
     renderTodos(todosList)
     searchbar.value = '';
 })
@@ -175,8 +197,43 @@ const logoutButton = document.getElementById('logout-button');
 logoutButton.addEventListener('click', () => {
     try {
         localStorage.removeItem('accessToken');
+        login.style.display = 'block';
+        app.style.display = 'none';
         alert('You have been logged out.');
     } catch (error) {
         console.error('Error during logout:', error);
     }
 })
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const accessToken = localStorage.getItem('accessToken');
+
+    if (accessToken) {
+        try {
+            const response = await fetch('http://localhost:3000/todos/fetch', {
+                method: "GET",
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                todosList = result.todos.map(todo => [todo.name, todo.done]);
+                renderTodos(todosList);
+                login.style.display = 'none';
+                app.style.display = 'block';
+            } else {
+                alert('Session expired. Please log in again.');
+                localStorage.removeItem('accessToken');
+                login.style.display = 'block';
+                app.style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Error fetching todos: ", error);
+        }
+    } else {
+        login.style.display = 'block';
+        app.style.display = 'none';
+    }
+});

@@ -1,5 +1,4 @@
 let todosList = [["Default todo", false]];
-let id = null;
 
 const searchbar = document.getElementById('searchbar');
 
@@ -11,6 +10,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     let username = document.getElementById('username').value.trim().toLowerCase();
     let password = document.getElementById('password').value.trim();
+
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 
     try {
         const response = await fetch('http://localhost:3000/users/login', {
@@ -27,8 +29,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (result.success) {
+            localStorage.setItem('accessToken', result.accessToken)
             todosList = result.todos.map(todo => [todo.name, todo.done]);
-            id = result.uid;
             renderTodos(todosList)
             login.style.display = 'none';
             app.style.display = 'block';
@@ -117,7 +119,6 @@ function renderTodos(_todos) {
 }
 
 const todoAdd = document.getElementById('todo-add');
-
 todoAdd.addEventListener('click', () => {
     const title = searchbar.value.toString();
 
@@ -132,7 +133,6 @@ todoAdd.addEventListener('click', () => {
 })
 
 const searchButton = document.getElementById('search-button');
-
 searchButton.addEventListener('click', () => {
     const value = searchbar.value.toString();
     if(value === ''){
@@ -147,23 +147,36 @@ searchButton.addEventListener('click', () => {
 })
 
 const saveButton = document.getElementById('save-button');
-
 saveButton.addEventListener('click', async () => {
     try {
+        const accessToken = localStorage.getItem('accessToken');
         const response = await fetch('http://localhost:3000/todos/save', {
             method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify({todos: todosList, UID: id})
+            body: JSON.stringify({todos: todosList})
         });
 
         if (response.ok) {
             alert("Todos saved successfully");
         } else {
-            alert("Something went wrong");
+            alert("Token expired, log in again.");
+            login.style.display = 'block';
+            app.style.display = 'none';
         }
     } catch (error) {
         console.error("Error saving todos: ", error);
+    }
+})
+
+const logoutButton = document.getElementById('logout-button');
+logoutButton.addEventListener('click', () => {
+    try {
+        localStorage.removeItem('accessToken');
+        alert('You have been logged out.');
+    } catch (error) {
+        console.error('Error during logout:', error);
     }
 })

@@ -8,7 +8,7 @@ const login = document.getElementById('login');
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    let username = document.getElementById('username').value.trim().toLowerCase();
+    let username = document.getElementById('username').value.trim();
     let password = document.getElementById('password').value.trim();
 
     document.getElementById('username').value = '';

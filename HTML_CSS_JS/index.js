@@ -24,27 +24,24 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
         const response = await fetch('http://localhost:3000/users/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
+            body: JSON.stringify({username, password }),
         });
 
         const result = await response.json();
 
         if (result.success) {
-            localStorage.setItem('accessToken', result.accessToken)
-            todos = result.todos.map(todo => ({name: todo.name, done: todo.done}));
-            renderTodos(todos)
+            localStorage.setItem('accessToken', result.accessToken);
+            todos = result.todos.map((todo) => ({ name: todo.name, done: todo.done }));
+            renderTodos(todos);
             login.style.display = 'none';
             app.style.display = 'block';
         } else {
-            alert("Invalid username or password!");
+            alert(result.error);
         }
     } catch (error) {
-        console.error("Error during login:", error);
+        console.error('Error during login:', error);
     }
 });
 
@@ -56,7 +53,7 @@ function renderTodos(todos) {
         todoDiv.classList.add('todo');
 
         const todoSpan = document.createElement('span');
-        todoSpan.classList.add('todo-name')
+        todoSpan.classList.add('todo-name');
         todoSpan.textContent = todo.name;
 
         const todoCheckbox = document.createElement('input');
@@ -68,16 +65,35 @@ function renderTodos(todos) {
             todoSpan.style.textDecoration = 'line-through';
         }
 
-        todoCheckbox.addEventListener("click", () => {
-            todo.done = !todo.done;
-            if(todoSpan.style.textDecoration === "line-through") {
-                todoSpan.style.color = "white";
-                todoSpan.style.textDecoration = "none";
-            } else {
-                todoSpan.style.color = "gray";
-                todoSpan.style.textDecoration = "line-through";
+        todoCheckbox.addEventListener('click', async () => {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const response = await fetch('http://localhost:3000/todos/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `${accessToken}`,
+                    },
+                    body: JSON.stringify({ name: todo.name, done: !todo.done }),
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    todo.done = !todo.done;
+                    if (todo.done) {
+                        todoSpan.style.color = 'gray';
+                        todoSpan.style.textDecoration = 'line-through';
+                    } else {
+                        todoSpan.style.color = 'white';
+                        todoSpan.style.textDecoration = 'none';
+                    }
+                    alert(result.message);
+                } else {
+                    alert(result.error);
+                }
+            } catch (error) {
+                console.error('Error toggling todo:', error);
             }
-        })
+        });
 
         todoSpan.addEventListener('click', () => {
             const modal = document.getElementById('edit-modal');
@@ -89,40 +105,76 @@ function renderTodos(todos) {
             modalInput.value = todo.name.trim();
             modal.style.display = 'block';
 
-            modalSave.onclick = () => {
+            modalSave.onclick = async () => {
                 const updatedName = modalInput.value.trim();
-
                 if (!updatedName) {
-                    alert("Todo name cannot be empty.");
+                    alert('Todo name cannot be empty.');
                     return;
                 }
 
-                const isDuplicate = todos.some(existingTodo => existingTodo.name === updatedName);
+                const isDuplicate = todos.some((existingTodo) => existingTodo.name === updatedName);
 
                 if (isDuplicate) {
-                    alert("A todo with this name already exists. Please use a different name.");
+                    alert('A todo with this name already exists. Please use a different name.');
                     return;
                 }
 
-                todos = todos.map(existingTodo => {
-                    if (existingTodo.name === todo.name) {
-                        return { ...existingTodo, name: updatedName };
+                try {
+                    const accessToken = localStorage.getItem('accessToken');
+                    const response = await fetch('http://localhost:3000/todos/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `${accessToken}`,
+                        },
+                        body: JSON.stringify({ oldName: todo.name, newName: updatedName }),
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        const todoToUpdate = todos.find(existingTodo => existingTodo.name === todo.name);
+                        if (todoToUpdate) {
+                            todoToUpdate.name = updatedName;
+                        }
+                        renderTodos(todos);
+                        modal.style.display = 'none';
+                        alert(result.message);
+                    } else {
+                        alert(result.error);
                     }
-                    return existingTodo;
-                });
-
-                renderTodos(todos);
-                modal.style.display = 'none';
+                } catch (error) {
+                    console.error('Error updating todo:', error);
+                }
             };
+
             modalCancel.onclick = () => {
                 modal.style.display = 'none';
-            }
-            modalDelete.onclick = () => {
-                todos = todos.filter(existingTodo => existingTodo.name !== todo.name);
+            };
 
-                renderTodos(todos);
-                modal.style.display = 'none';
-            }
+            modalDelete.onclick = async () => {
+
+                try {
+                    const accessToken = localStorage.getItem('accessToken');
+                    const response = await fetch('http://localhost:3000/todos/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `${accessToken}`,
+                        },
+                        body: JSON.stringify({ name: todo.name }),
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        todos = todos.filter((existingTodo) => existingTodo.name !== todo.name);
+                        renderTodos(todos);
+                        modal.style.display = 'none';
+                        alert(result.message);
+                    } else {
+                        alert(result.error);
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            };
         });
 
         todoDiv.appendChild(todoSpan);
@@ -131,36 +183,55 @@ function renderTodos(todos) {
     });
 }
 
-addTodoButton.addEventListener('click', () => {
+addTodoButton.addEventListener('click', async () => {
     const todoName = searchbar.value.trim();
 
-    if(todoName === ''){
+    if (todoName === '') {
         alert("Todo name can't be empty");
         return;
     }
 
-    const isDuplicate = todos.some(existingTodo => existingTodo.name === todoName);
+    const isDuplicate = todos.some((existingTodo) => existingTodo.name === todoName);
     if (isDuplicate) {
-        alert("A todo with this name already exists. Please use a different name.");
+        alert('A todo with this name already exists. Please use a different name.');
         searchbar.value = '';
         return;
     }
 
-    todos.push({ name: todoName, done: false });
-    renderTodos(todos)
-    searchbar.value = '';
-})
+    try {
+        const accessToken = localStorage.getItem('accessToken');
+        const response = await fetch('http://localhost:3000/todos/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `${accessToken}`,
+            },
+            body: JSON.stringify({ name: todoName }),
+        });
+        const result = await response.json();
+        if (response.ok) {
+            todos.push({ name: todoName, done: false });
+            renderTodos(todos);
+            searchbar.value = '';
+            alert(result.message);
+        } else {
+            alert(result.error);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+});
 
 searchButton.addEventListener('click', () => {
     const value = searchbar.value.trim();
     if (value === '') {
-        renderTodos(todos)
+        renderTodos(todos);
     } else {
-        const filteredTodos = todos.filter(todo => todo.name.includes(value));
-        renderTodos(filteredTodos)
+        const filteredTodos = todos.filter((todo) => todo.name.includes(value));
+        renderTodos(filteredTodos);
     }
     searchbar.value = '';
-})
+});
 
 logoutButton.addEventListener('click', () => {
     try {
@@ -171,7 +242,7 @@ logoutButton.addEventListener('click', () => {
     } catch (error) {
         console.error('Error during logout:', error);
     }
-})
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
     const accessToken = localStorage.getItem('accessToken');
@@ -181,24 +252,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         app.style.display = 'block';
         try {
             const response = await fetch('http://localhost:3000/todos/fetch', {
-                method: "GET",
+                method: 'GET',
                 headers: {
                     'Authorization': `${accessToken}`,
-                }
+                },
             });
-
+            const result = await response.json();
             if (response.ok) {
-                const result = await response.json();
-                todos = result.todos.map(todo => ({ name: todo.name, done: todo.done}));
+                todos = result.todos.map((todo) => ({ name: todo.name, done: todo.done }));
                 renderTodos(todos);
             } else {
-                alert('Session expired. Please log in again.');
                 localStorage.removeItem('accessToken');
                 login.style.display = 'block';
                 app.style.display = 'none';
             }
         } catch (error) {
-            console.error("Error fetching todos: ", error);
+            console.error('Error fetching todos:', error);
         }
     } else {
         login.style.display = 'block';

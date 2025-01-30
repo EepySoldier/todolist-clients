@@ -151,15 +151,6 @@
     transition: background-color 0.3s;
 }
 
-#save-button {
-    left: 20px;
-    background-color: #4CAF50;
-}
-
-#save-button:hover {
-    background-color: #45a049;
-}
-
 #logout-button {
     right: 20px;
     background-color: #f44336;

@@ -1,18 +1,24 @@
-let todosList = [];
-
 const searchbar = document.getElementById('searchbar');
-
 const app = document.getElementById('app');
 const login = document.getElementById('login');
+const todoListContainer = document.getElementById('todos');
+const addTodoButton = document.getElementById('todo-add');
+const searchButton = document.getElementById('search-button');
+const logoutButton = document.getElementById('logout-button');
+
+let todos = [];
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    let username = document.getElementById('username').value.trim();
-    let password = document.getElementById('password').value.trim();
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
 
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    usernameInput.value = '';
+    passwordInput.value = '';
 
     try {
         const response = await fetch('http://localhost:3000/users/login', {
@@ -30,8 +36,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
         if (result.success) {
             localStorage.setItem('accessToken', result.accessToken)
-            todosList = result.todos.map(todo => [todo.name, todo.done]);
-            renderTodos(todosList)
+            todos = result.todos.map(todo => ({name: todo.name, done: todo.done}));
+            renderTodos(todos)
             login.style.display = 'none';
             app.style.display = 'block';
         } else {
@@ -42,22 +48,20 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     }
 });
 
-function renderTodos(_todos) {
-    const todos = document.getElementById('todos');
-    todos.innerHTML = '';
+function renderTodos(todos) {
+    todoListContainer.innerHTML = '';
 
-    //Todo[0] - name, Todo[1] - done
-    _todos.forEach((todo) => {
+    todos.forEach((todo) => {
         const todoDiv = document.createElement('div');
         todoDiv.classList.add('todo');
 
         const todoSpan = document.createElement('span');
         todoSpan.classList.add('todo-name')
-        todoSpan.textContent = todo[0];
+        todoSpan.textContent = todo.name;
 
         const todoCheckbox = document.createElement('input');
         todoCheckbox.type = 'checkbox';
-        todoCheckbox.checked = todo[1]
+        todoCheckbox.checked = todo.done;
 
         if (todoCheckbox.checked) {
             todoSpan.style.color = 'gray';
@@ -65,7 +69,7 @@ function renderTodos(_todos) {
         }
 
         todoCheckbox.addEventListener("click", () => {
-            todo[1] = !todo[1]
+            todo.done = !todo.done;
             if(todoSpan.style.textDecoration === "line-through") {
                 todoSpan.style.color = "white";
                 todoSpan.style.textDecoration = "none";
@@ -82,7 +86,7 @@ function renderTodos(_todos) {
             const modalDelete = document.getElementById('modal-delete');
             const modalCancel = document.getElementById('modal-cancel');
 
-            modalInput.value = todo[0].trim();
+            modalInput.value = todo.name.trim();
             modal.style.display = 'block';
 
             modalSave.onclick = () => {
@@ -93,102 +97,71 @@ function renderTodos(_todos) {
                     return;
                 }
 
-                const isDuplicate = todosList.some(Todo => Todo[0] === updatedName);
+                const isDuplicate = todos.some(existingTodo => existingTodo.name === updatedName);
 
                 if (isDuplicate) {
                     alert("A todo with this name already exists. Please use a different name.");
                     return;
                 }
 
-                todosList = todosList.map(Todo => {
-                    if (Todo[0] === todo[0]) {
-                        return [updatedName, Todo[1]];
+                todos = todos.map(existingTodo => {
+                    if (existingTodo.name === todo.name) {
+                        return { ...existingTodo, name: updatedName };
                     }
-                    return Todo;
+                    return existingTodo;
                 });
 
-                renderTodos(todosList);
+                renderTodos(todos);
                 modal.style.display = 'none';
             };
             modalCancel.onclick = () => {
                 modal.style.display = 'none';
             }
             modalDelete.onclick = () => {
-                todosList = todosList.filter(Todo => Todo[0] !== todo[0]);
+                todos = todos.filter(existingTodo => existingTodo.name !== todo.name);
 
-                renderTodos(todosList);
+                renderTodos(todos);
                 modal.style.display = 'none';
             }
         });
 
         todoDiv.appendChild(todoSpan);
         todoDiv.appendChild(todoCheckbox);
-
-        todos.appendChild(todoDiv);
+        todoListContainer.appendChild(todoDiv);
     });
 }
 
-const todoAdd = document.getElementById('todo-add');
-todoAdd.addEventListener('click', () => {
-    const todoName = searchbar.value.toString();
+addTodoButton.addEventListener('click', () => {
+    const todoName = searchbar.value.trim();
 
     if(todoName === ''){
         alert("Todo name can't be empty");
         return;
     }
 
-    const isDuplicate = todosList.some(Todo => Todo[0] === todoName);
+    const isDuplicate = todos.some(existingTodo => existingTodo.name === todoName);
     if (isDuplicate) {
         alert("A todo with this name already exists. Please use a different name.");
         searchbar.value = '';
         return;
     }
 
-    todosList = [...todosList, [todoName, false]]
-    renderTodos(todosList)
+    todos.push({ name: todoName, done: false });
+    renderTodos(todos)
     searchbar.value = '';
 })
 
-const searchButton = document.getElementById('search-button');
 searchButton.addEventListener('click', () => {
-    const value = searchbar.value.toString();
-    if(value === ''){
-        renderTodos(todosList)
+    const value = searchbar.value.trim();
+    if (value === '') {
+        renderTodos(todos)
     } else {
-        const newTodos = todosList.filter(todo => {
-            return todo.includes(value)
-        })
-        renderTodos(newTodos)
+        const filteredTodos = todos.filter(todo => todo.name.includes(value));
+        renderTodos(filteredTodos)
     }
     searchbar.value = '';
 })
 
-const saveButton = document.getElementById('save-button');
-saveButton.addEventListener('click', async () => {
-    try {
-        const accessToken = localStorage.getItem('accessToken');
-        const response = await fetch('http://localhost:3000/todos/save', {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({todos: todosList})
-        });
-
-        if (response.ok) {
-            alert("Todos saved successfully");
-        } else {
-            alert("Token expired, log in again.");
-            login.style.display = 'block';
-            app.style.display = 'none';
-        }
-    } catch (error) {
-        console.error("Error saving todos: ", error);
-    }
-})
-
-const logoutButton = document.getElementById('logout-button');
 logoutButton.addEventListener('click', () => {
     try {
         localStorage.removeItem('accessToken');
@@ -210,16 +183,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch('http://localhost:3000/todos/fetch', {
                 method: "GET",
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
+                    'Authorization': `${accessToken}`,
                 }
             });
 
             if (response.ok) {
                 const result = await response.json();
-                todosList = result.todos.map(todo => [todo.name, todo.done]);
-                renderTodos(todosList);
-                login.style.display = 'none';
-                app.style.display = 'block';
+                todos = result.todos.map(todo => ({ name: todo.name, done: todo.done}));
+                renderTodos(todos);
             } else {
                 alert('Session expired. Please log in again.');
                 localStorage.removeItem('accessToken');

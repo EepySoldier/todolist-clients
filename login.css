@@ -1,4 +1,4 @@
-#login {
+.login {
     width: 100%;
     max-width: 400px;
     background: #1c3b57;
@@ -14,7 +14,7 @@
     }
 }
 
-#login-form {
+.loginForm {
     display: flex;
     flex-direction: column;
     gap: 15px;

@@ -15,13 +15,13 @@
     }
 }
 
-.todo-list {
+.todoList {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
-.todo-search {
+.todoSearch {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -37,7 +37,7 @@
             color: #d3e4f1;
         }
 
-        #searchbar {
+        .searchbar {
             width: 50%;
             max-width: 200px;
             padding: 5px 10px;
@@ -48,7 +48,7 @@
         }
     }
 
-    #search-button {
+    .searchButton {
         padding: 5px 10px;
         background: #4b9ed8;
         color: #fff;
@@ -81,7 +81,7 @@
         color: #d3e4f1;
         transition: background 0.3s ease;
 
-        .todo-name:hover{
+        .todoName:hover{
             cursor: pointer;
         }
 
@@ -93,7 +93,7 @@
 
 
 
-#todo-add {
+.todoAdd {
     width: 100%;
     padding: 10px;
     background: #4b9ed8;
@@ -107,7 +107,7 @@
     }
 }
 
-#edit-modal {
+.editModal {
     z-index: 1000;
     border-radius: 8px;
     display: none;
@@ -131,11 +131,11 @@
         border-radius: 4px;
     }
 
-    #modal-save {
+    .modalSave {
         color:green;
     }
 
-    #modal-delete {
+    .modalDelete {
         color: red;
     }
 }
@@ -151,11 +151,11 @@
     transition: background-color 0.3s;
 }
 
-#logout-button {
+.logoutButton {
     right: 20px;
     background-color: #f44336;
 }
 
-#logout-button:hover {
+.logoutButton:hover {
     background-color: #e53935;
 }

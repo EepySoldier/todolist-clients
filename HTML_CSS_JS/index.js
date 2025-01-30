@@ -53,7 +53,7 @@ function renderTodos(todos) {
         todoDiv.classList.add('todo');
 
         const todoSpan = document.createElement('span');
-        todoSpan.classList.add('todo-name');
+        todoSpan.classList.add('todoName');
         todoSpan.textContent = todo.name;
 
         const todoCheckbox = document.createElement('input');

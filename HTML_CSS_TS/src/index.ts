@@ -43,7 +43,7 @@ document.getElementById('login-form')?.addEventListener('submit', async (e: Even
             login.style.display = 'none';
             app.style.display = 'block';
         } else {
-            alert('Invalid username or password!');
+            alert(result.error);
         }
     } catch (error) {
         console.error('Error during login:', error);
@@ -81,7 +81,7 @@ function renderTodos(todos: Todo[]): void {
                     },
                     body: JSON.stringify({ name: todo.name, done: !todo.done }),
                 });
-
+                const result = await response.json();
                 if (response.ok) {
                     todo.done = !todo.done;
                     if (todo.done) {
@@ -91,8 +91,9 @@ function renderTodos(todos: Todo[]): void {
                         todoSpan.style.color = 'white';
                         todoSpan.style.textDecoration = 'none';
                     }
+                    alert(result.message);
                 } else {
-                    alert('Error toggling todo.');
+                    alert(result.error);
                 }
             } catch (error) {
                 console.error('Error toggling todo:', error);
@@ -133,7 +134,7 @@ function renderTodos(todos: Todo[]): void {
                         },
                         body: JSON.stringify({ oldName: todo.name, newName: updatedName }),
                     });
-
+                    const result = await response.json();
                     if (response.ok) {
                         const todoToUpdate = todos.find(existingTodo => existingTodo.name === todo.name);
                         if (todoToUpdate) {
@@ -141,9 +142,9 @@ function renderTodos(todos: Todo[]): void {
                         }
                         renderTodos(todos);
                         modal.style.display = 'none';
-
+                        alert(result.message);
                     } else {
-                        alert('Error saving the updated todo');
+                        alert(result.error);
                     }
                 } catch (error) {
                     console.error('Error updating todo:', error);
@@ -166,13 +167,14 @@ function renderTodos(todos: Todo[]): void {
                         },
                         body: JSON.stringify({ name: todo.name }),
                     });
-
+                    const result = await response.json();
                     if (response.ok) {
                         todos = todos.filter((existingTodo) => existingTodo.name !== todo.name);
                         renderTodos(todos);
                         modal.style.display = 'none';
+                        alert(result.message);
                     } else {
-                        alert('Error deleting the todo');
+                        alert(result.error);
                     }
                 } catch (error) {
                     console.error(error);
@@ -211,13 +213,14 @@ addTodoButton.addEventListener('click', async () => {
             },
             body: JSON.stringify({ name: todoName }),
         });
-
+        const result = await response.json();
         if (response.ok) {
             todos.push({ name: todoName, done: false });
             renderTodos(todos);
             searchbar.value = '';
+            alert(result.message);
         } else {
-            alert('Error deleting the todo');
+            alert(result.error);
         }
     } catch (error) {
         console.error(error);
@@ -259,13 +262,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     'Authorization': `${accessToken}`,
                 },
             });
-
+            const result = await response.json();
             if (response.ok) {
-                const result = await response.json();
                 todos = result.todos.map((todo: Todo) => ({ name: todo.name, done: todo.done }));
                 renderTodos(todos);
             } else {
-                alert('Session expired. Please log in again.');
                 localStorage.removeItem('accessToken');
                 login.style.display = 'block';
                 app.style.display = 'none';

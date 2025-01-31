@@ -7,7 +7,7 @@ function renderTodos(todos: Todo[]) {
         todoDiv.classList.add('todo');
 
         const todoSpan = document.createElement('span');
-        todoSpan.classList.add('todo-name');
+        todoSpan.classList.add('todoName');
         todoSpan.textContent = todo.name;
         todoSpan.addEventListener('click', () => setupModalButtons(todo));
 
@@ -51,6 +51,7 @@ function setupUIEventListeners() {
     (document.getElementById('todo-add') as HTMLElement).addEventListener('click', () => {
         const todoName = (document.getElementById('searchbar') as HTMLInputElement).value.trim();
         addTodo(todoName);
+        (document.getElementById('searchbar') as HTMLInputElement).value = '';
     });
 
     (document.getElementById('search-button') as HTMLElement).addEventListener('click', () => {

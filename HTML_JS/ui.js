@@ -51,6 +51,7 @@ function setupUIEventListeners() {
     document.getElementById('todo-add').addEventListener('click', () => {
         const todoName = document.getElementById('searchbar').value.trim();
         addTodo(todoName);
+        document.getElementById('searchbar').value = '';
     });
 
     document.getElementById('search-button').addEventListener('click', () => {

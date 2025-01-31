@@ -57,7 +57,7 @@ async function toggleTodo(todo: Todo) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/toggle', {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${accessToken}`,
@@ -81,7 +81,7 @@ async function updateTodo(oldName: string, newName: string) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/update', {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${accessToken}`,
@@ -106,7 +106,7 @@ async function deleteTodo(todoName: string) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/delete', {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${accessToken}`

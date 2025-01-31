@@ -51,7 +51,7 @@ async function toggleTodo(todo) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/toggle', {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${accessToken}`
@@ -75,7 +75,7 @@ async function updateTodo(oldName, newName) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/update', {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${accessToken}`
@@ -99,13 +99,12 @@ async function updateTodo(oldName, newName) {
 async function deleteTodo(todoName) {
     const accessToken = localStorage.getItem('accessToken');
     try {
-        const response = await fetch('http://localhost:3000/todos/delete', {
-            method: 'POST',
+        const response = await fetch(`http://localhost:3000/todos/delete?name=${encodeURIComponent(todoName)}`, {
+            method: 'DELETE',
             headers: {
+                'Authorization': `${accessToken}`,
                 'Content-Type': 'application/json',
-                'Authorization': `${accessToken}`
             },
-            body: JSON.stringify({ name: todoName }),
         });
 
         const result = await response.json();

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This app was made with HTML, CSS and JavaScript">
+    <meta name="keywords" content="HTML, JavaScript,TODO">
+    <meta name="author" content="Szymon">
+    <title>TODO App</title>
+    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="../app.css">
+    <link rel="stylesheet" href="../login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="login" id="login">
+        <h1>Login</h1>
+        <form class="loginForm" id="login-form">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="Enter Username" autocomplete="off">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Enter Password">
+            <input type="submit" value="Login">
+        </form>
+    </div>
+    <div class="app" id="app">
+        <h1>TODO App with HTML & JS</h1>
+
+        <div class="todoList">
+            <div class="todoSearch">
+                <div>
+                    <label for="searchbar">Search/Add todo: </label>
+                    <input type="text" name="searchbar" class="searchbar" id="searchbar" autocomplete="off">
+                </div>
+                <button class="searchButton" id="search-button">Search</button>
+            </div>
+            <div class="todos" id="todos">
+            </div>
+            <button class="todoAdd" id="todo-add">Add Todo</button>
+        </div>
+
+        <div class="btn logoutButton" id="logout-button">
+            Log out
+        </div>
+    </div>
+
+    <div class="editModal" id="edit-modal">
+        <h3>Edit Todo</h3>
+        <input type="text" id="modal-input" />
+        <button class="modalSave" id="modal-save">Save</button>
+        <button class="modalCancel" id="modal-cancel">Cancel</button>
+        <button class="modalDelete" id="modal-delete">Delete</button>
+    </div>
+    <script src="./todos.js"></script>
+    <script src="./ui.js"></script>
+    <script src="./auth.js"></script>
+    <script src="./index.js"></script>
+</body>
+</html>

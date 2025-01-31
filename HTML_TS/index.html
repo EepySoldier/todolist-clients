@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="This app was made with HTML, CSS and JavaScript">
-    <meta name="keywords" content="HTML, CSS, JavaScript,TODO">
+    <meta name="keywords" content="HTML, JavaScript,TODO">
     <meta name="author" content="Szymon">
     <title>TODO App</title>
     <link rel="stylesheet" href="../index.css">
@@ -26,7 +26,7 @@
     </form>
 </div>
 <div class="app" id="app">
-    <h1>TODO App with HTML, CSS & TS</h1>
+    <h1>TODO App with HTML & TS</h1>
 
     <div class="todoList">
         <div class="todoSearch">
@@ -41,18 +41,21 @@
         <button class="todoAdd" id="todo-add">Add Todo</button>
     </div>
 
-    <div class="btn" id="logout-button">
+    <div class="btn logoutButton" id="logout-button">
         Log out
     </div>
 </div>
 
-<div class="editModal logoutButton" id="edit-modal">
+<div class="editModal" id="edit-modal">
     <h3>Edit Todo</h3>
     <input type="text" id="modal-input" />
     <button class="modalSave" id="modal-save">Save</button>
     <button class="modalCancel" id="modal-cancel">Cancel</button>
     <button class="modalDelete" id="modal-delete">Delete</button>
 </div>
+<script src="dist/auth.js"></script>
+<script src="dist/todos.js"></script>
+<script src="dist/ui.js"></script>
 <script src="dist/index.js"></script>
 </body>
 </html>

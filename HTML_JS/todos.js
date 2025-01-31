@@ -29,7 +29,9 @@ async function addTodo(todoName) {
     try {
         const response = await fetch('http://localhost:3000/todos/add', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `${accessToken}` },
+            headers: { 'Content-Type': 'application/json',
+                'Authorization': `${accessToken}`
+            },
             body: JSON.stringify({ name: todoName }),
         });
 

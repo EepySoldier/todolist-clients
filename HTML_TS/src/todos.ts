@@ -1,11 +1,13 @@
-type Todo = {
+import { renderTodos } from "./ui.js";
+
+export type Todo = {
     name: string;
     done: boolean;
 };
 
-let todos: Todo[] = [];
+export let todos: Todo[] = [];
 
-async function fetchTodos() {
+export async function fetchTodos() {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/fetch', {
@@ -28,7 +30,7 @@ async function fetchTodos() {
     }
 }
 
-async function addTodo(todoName: string) {
+export async function addTodo(todoName: string) {
     if (!todoName) return alert("Todo name can't be empty");
 
     const accessToken = localStorage.getItem('accessToken');
@@ -53,7 +55,7 @@ async function addTodo(todoName: string) {
     }
 }
 
-async function toggleTodo(todo: Todo) {
+export async function toggleTodo(todo: Todo) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/toggle', {
@@ -77,7 +79,7 @@ async function toggleTodo(todo: Todo) {
     }
 }
 
-async function updateTodo(oldName: string, newName: string) {
+export async function updateTodo(oldName: string, newName: string) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/update', {
@@ -102,7 +104,7 @@ async function updateTodo(oldName: string, newName: string) {
     }
 }
 
-async function deleteTodo(todoName: string) {
+export async function deleteTodo(todoName: string) {
     const accessToken = localStorage.getItem('accessToken');
     try {
         const response = await fetch('http://localhost:3000/todos/delete', {

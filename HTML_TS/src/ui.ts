@@ -1,4 +1,7 @@
-function renderTodos(todos: Todo[]) {
+import { Todo, toggleTodo, addTodo, deleteTodo, updateTodo, todos} from "./todos.js";
+import { handleLogin, handleLogout } from "./auth.js";
+
+export function renderTodos(todos: Todo[]) {
     const todoListContainer = document.getElementById('todos') as HTMLElement;
     todoListContainer.innerHTML = '';
 
@@ -22,7 +25,7 @@ function renderTodos(todos: Todo[]) {
     });
 }
 
-function setupModalButtons(todo: Todo) {
+export function setupModalButtons(todo: Todo) {
     const modal = document.getElementById('edit-modal') as HTMLElement;
     const modalInput = document.getElementById('modal-input') as HTMLInputElement;
     const modalSave = document.getElementById('modal-save') as HTMLElement;
@@ -47,7 +50,7 @@ function setupModalButtons(todo: Todo) {
     };
 }
 
-function setupUIEventListeners() {
+export function setupUIEventListeners() {
     (document.getElementById('todo-add') as HTMLElement).addEventListener('click', () => {
         const todoName = (document.getElementById('searchbar') as HTMLInputElement).value.trim();
         addTodo(todoName);

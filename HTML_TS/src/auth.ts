@@ -1,4 +1,6 @@
-async function handleLogin(e: SubmitEvent) {
+import { fetchTodos } from "./todos.js";
+
+export async function handleLogin(e: SubmitEvent) {
     e.preventDefault();
 
     const usernameInput = document.getElementById('username') as HTMLInputElement;
@@ -34,14 +36,14 @@ async function handleLogin(e: SubmitEvent) {
     }
 }
 
-function handleLogout() {
+export function handleLogout() {
     localStorage.removeItem('accessToken');
     (document.getElementById('login') as HTMLElement).style.display = 'block';
     (document.getElementById('app') as HTMLElement).style.display = 'none';
     alert('You have been logged out.');
 }
 
-function checkAuthOnLoad() {
+export function checkAuthOnLoad() {
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
         (document.getElementById('login') as HTMLElement).style.display = 'none';
